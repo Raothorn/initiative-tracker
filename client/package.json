@@ -13,6 +13,7 @@
     "core-js": "^3.37.1",
     "roboto-fontface": "*",
     "share": "file:../share",
+    "socket.io-client": "^4.7.5",
     "vue": "^3.4.31",
     "vuetify": "^3.6.11"
   },
