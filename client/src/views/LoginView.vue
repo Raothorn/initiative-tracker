@@ -1,7 +1,5 @@
 <script setup lang="ts"></script>
 
 <template>
-  <main>
-    Login!
-  </main>
+  <main>Login!</main>
 </template>
