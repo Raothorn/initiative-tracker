@@ -28,7 +28,6 @@ public class Server
             {
                 Log.Debug("Client connected");
                 Client client = new Client(socket);
-                _serverState.AddClient(client);
 
                 socket.On(
                     "message",
@@ -40,7 +39,7 @@ public class Server
 
                             Log.Debug($"Recieved raw message: {payload}");
 
-                            if (payload is not null ) 
+                            if (payload is not null) 
                             {
                                 IAction action = actionBuilder.BuildAction(payload);
                                 Console.WriteLine(action);
@@ -68,7 +67,7 @@ public class Server
                 socket.On(
                     SocketIOEvent.DISCONNECT, () =>
                     {
-                        Console.WriteLine("Client disconnected!");
+                        Log.Debug("Client disconnected!");
                     }
                 );
             }

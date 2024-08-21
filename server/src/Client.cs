@@ -1,15 +1,21 @@
 namespace Server;
 
-using com.csutil;
 using SocketIOSharp.Server.Client;
 
-public class Client 
+public interface IClient 
 {
-    private SocketIOSocket _socket;
+    void Login(string username, ClientType clientType);
+    bool IsLoggedIn { get; }
+    string Username { get; }
+}
+
+public class Client : IClient
+{
+    private SocketIOSocket? _socket;
     private string? _username = null;
     private ClientType? _clientType = null;
 
-    public Client(SocketIOSocket socket) 
+    public Client(SocketIOSocket? socket) 
     {
         _socket = socket;
     }

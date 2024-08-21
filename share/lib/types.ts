@@ -1,7 +1,7 @@
 export type Combatant = {
     name: String,
-    maxHitpoints: number,
-    currentHitpoints: number,
+    max_hitpoints: number,
+    current_hitpoints: number,
     initiative: number
 }
 
