@@ -1,5 +1,7 @@
 <template>
-  <p> Name:  {{ combatant.name }} HP: {{ combatant.currentHitpoints }} </p>
+  <td>{{ combatant.name }}</td>
+  <td></td>
+  <td>{{ combatant.currentHitpoints }}</td>
 </template>
 
 <script setup lang="ts">

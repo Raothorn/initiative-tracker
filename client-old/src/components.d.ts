@@ -7,10 +7,15 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AddPlayerEffectModal: typeof import('./components/AddPlayerEffectModal.vue')['default']
     AppFooter: typeof import('./components/AppFooter.vue')['default']
+    AppHeader: typeof import('./components/AppHeader.vue')['default']
     CombatantView: typeof import('./components/CombatantView.vue')['default']
+    EffectsList: typeof import('./components/EffectsList.vue')['default']
     EncounterCreator: typeof import('./components/EncounterCreator.vue')['default']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
+    InfoView: typeof import('./components/InfoView.vue')['default']
+    InitiativeTable: typeof import('./components/InitiativeTable.vue')['default']
     Login: typeof import('./components/Login.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

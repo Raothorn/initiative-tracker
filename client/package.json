@@ -3,12 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "dev": "vite",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "share": "file:../share",
+    "vite": "^5.4.2",
     "vue": "^3.2.13"
   },
   "devDependencies": {
