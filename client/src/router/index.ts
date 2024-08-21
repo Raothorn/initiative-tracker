@@ -27,7 +27,9 @@ const router = createRouter({
       name: 'info',
       component: () => import('../views/InfoView.vue')
     }
-  ]
+  ],
+  linkActiveClass: "active",
+  linkExactActiveClass: "exact-active"
 })
 
 export default router
