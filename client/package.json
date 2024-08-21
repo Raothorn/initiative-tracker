@@ -11,6 +11,7 @@
   "dependencies": {
     "core-js": "^3.8.3",
     "share": "file:../share",
+    "typescript": "^5.5.4",
     "vite": "^5.4.2",
     "vue": "^3.2.13"
   },
