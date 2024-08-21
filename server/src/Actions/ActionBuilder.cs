@@ -38,7 +38,6 @@ public class ActionBuilder
     class ActionMessage 
     {
         public string action_type { get; set; }
-
         public JObject payload { get; set; }
     }
 }

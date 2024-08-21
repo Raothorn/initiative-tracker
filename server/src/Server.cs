@@ -35,37 +35,36 @@ public class Server
                     {
                         if (data.Any())
                         {
-                            var payload = (string?) data[0];
+                            var payload = (string?)data[0];
 
                             Log.Debug($"Recieved raw message: {payload}");
 
-                            if (payload is not null) 
+                            if (payload is not null)
                             {
                                 IAction action = actionBuilder.BuildAction(payload);
                                 Console.WriteLine(action);
                                 var result = action.Execute(_serverState, client);
 
-                                if (result.Succeeded) 
+                                if (result.Succeeded)
                                 {
                                     Log.Debug(result.Message);
                                 }
-                                else 
+                                else
                                 {
                                     Log.Error(result.Message);
                                 }
                             }
-
                         }
                         else
                         {
                             Log.Error("No action received.");
                         }
                     }
-
                 );
 
                 socket.On(
-                    SocketIOEvent.DISCONNECT, () =>
+                    SocketIOEvent.DISCONNECT,
+                    () =>
                     {
                         Log.Debug("Client disconnected!");
                     }
@@ -76,7 +75,7 @@ public class Server
         _server.Start();
     }
 
-    public void Close() 
+    public void Close()
     {
         Log.Debug("Closing server");
         _server.Stop();
