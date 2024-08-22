@@ -1,12 +1,9 @@
 use serde::Serialize;
 
-#[derive(Serialize, Clone)]
+#[derive(Clone)]
 pub struct GameState {
     combatants: Vec<Combatant>,
-
-    #[serde(rename = "currentTurnId")]
     current_turn_id: u32,
-
     turn_number: u32
 }
 
@@ -37,6 +34,13 @@ impl GameState {
         GameState::new(&players)
     }
 
+    pub fn serialize(&self) -> SerialGameState {
+        SerialGameState {
+            combatants: self.combatants.clone(),
+            current_turn_id: self.get_current_turn_id(),
+        }
+    }
+
     pub fn advance_turn(&self) -> Result<Self, String> {
         let mut gs = self.clone();
         gs.turn_number = (self.turn_number + 1) % self.combatants.len() as u32; 
@@ -56,6 +60,14 @@ impl GameState {
         let combatants = &self.sorted_combatants();
         combatants[self.turn_number as usize].id
     }
+}
+
+// Serialization
+#[derive(Serialize)]
+pub struct SerialGameState {
+    combatants: Vec<Combatant>,
+    #[serde(rename = "currentTurnId")]
+    current_turn_id: u32,
 }
 
 #[derive(Serialize, Clone)]
