@@ -1,9 +1,9 @@
 # .github/workflows/release.yml
 
 on:
-  push:
-    branches:
-      - dev
+  release:
+    types: [created]
+
 jobs:
   release:
     name: release ${{ matrix.target }}
