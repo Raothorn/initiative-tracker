@@ -4,6 +4,9 @@ import PlayerHeader from './components/PlayerHeader.vue'
 import TurnStateAlert from './components/TurnStateAlert.vue'
 import AddEffectModal from './components/AddEffectModal.vue'
 import MockStateControl from './components/MockStateControl.vue'
+import {$socket} from './socket'
+
+$socket.connect()
 </script>
 
 <template>

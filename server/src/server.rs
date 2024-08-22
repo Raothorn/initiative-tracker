@@ -7,6 +7,7 @@ use std::{
     thread,
 };
 
+use serde_json::json;
 use websocket::{
     sync::{Server, Writer},
     Message, OwnedMessage,
@@ -17,8 +18,12 @@ use crate::gamestate::GameState;
 
 type Sender = Writer<TcpStream>;
 
+struct GameManager {
+    state: GameState,
+}
+
 struct ServerState {
-    gamestate: Mutex<GameState>,
+    manager: Mutex<GameManager>,
     clients: Mutex<HashMap<String, Sender>>,
 }
 
@@ -30,7 +35,14 @@ impl ServerState {
     }
 
     fn broadcast_gamestate(&self) {
+        let manager = self.manager.lock().unwrap();
 
+        let message = json!({
+            "msgType": "update",
+            "msgData": manager.state,
+        });
+
+        self.broadcast(&message.to_string())
     }
 
     fn broadcast(&self, msg: &str) {
@@ -49,7 +61,9 @@ impl ServerState {
 
 pub fn run_server() {
     let state = Arc::new(ServerState {
-        gamestate: Mutex::new(GameState::init()),
+        manager: Mutex::new(GameManager {
+            state: GameState::init(),
+        }),
         clients: Mutex::new(HashMap::new()),
     });
     let wsserver = Server::bind("localhost:9001").unwrap();
@@ -68,8 +82,7 @@ pub fn run_server() {
             let (mut reciever, sender) = client.split().unwrap();
             state.add_client(&client_addr, sender);
 
-            state.broadcast("Hi");
-
+            state.broadcast_gamestate();
 
             for message in reciever.incoming_messages() {
                 match message {

@@ -2,9 +2,16 @@
 import { defineStore } from 'pinia'
 import { computed, ref, type Ref } from 'vue'
 import type { GameState, Encounter, Combatant } from '../models'
+import $socket from '@/socket'
 
 export const useGameState = defineStore('gameState', () => {
   const gameState: Ref<GameState> = ref(mockGameState())
+
+  // Setup gamestate updates via websocket
+  $socket.$onStateUpdate((newState:GameState) => {
+      console.log("updating state", newState)
+      gameState.value = newState
+  })
 
   const sortedCombatants = computed(() => {
     let combatants = gameState.value.combatants

@@ -1,5 +1,10 @@
+use serde::Serialize;
+
+#[derive(Serialize)]
 pub struct GameState {
     combatants: Vec<Combatant>,
+    #[serde(rename = "currentTurnId")]
+    current_turn_id: i32
 }
 
 impl GameState {
@@ -17,7 +22,8 @@ impl GameState {
             .collect();
 
         GameState {
-            combatants: combatants,
+            combatants,
+            current_turn_id: 0
         }
     }
 
@@ -28,11 +34,14 @@ impl GameState {
 
 }
 
+#[derive(Serialize)]
 pub struct Combatant {
     id: i32,
     name: String,
     user: String,
+    #[serde(rename = "initRoll")]
     init_roll: i32,
+    #[serde(rename = "initMod")]
     init_mod: i32,
 }
 
