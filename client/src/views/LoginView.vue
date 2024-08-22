@@ -1,6 +1,7 @@
 <template>
   <main>
-    <input type="text" label="Username " :value="usernameInput"></input>
+    <input type="text" label="Username " v-model="usernameInput"></input>
+    <button @click="login">Login</button>
   </main>
 </template>
 

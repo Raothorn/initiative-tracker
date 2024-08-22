@@ -72,12 +72,13 @@ impl ServerState {
                     Some(client) => { 
                         match client.username {
                             Some(_) => { println!("Client already logged in...") },
-                            None => { client.login(username) },
+                            None => { 
+                                client.login(username) ;
+                                println!("CLient logged in as {:?}", client.username);
+                            },
                         }
-                        client.login(username);
-                        println!("CLient logged in as {:?}", client.username);
                     },
-                    None => { println!("Invalid login data")},
+                    None => { println!("Invalid login data")} ,
                 }
             },
             _ => {}

@@ -1,3 +1,4 @@
+import $socket from '@/socket'
 import { defineStore } from 'pinia'
 import { computed, ref, type Ref } from 'vue'
 
@@ -13,6 +14,8 @@ export const useUser = defineStore('user', () => {
 
     // Mutators
     function login(_username: string)  {
+      // TODO wait for confirmation from server before setting username on client side
+      $socket.sendLogin(_username)
       username.value = _username
     }
 

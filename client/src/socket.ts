@@ -14,11 +14,9 @@ class SocketManager {
             console.log("connected")
         };
 
+        // TODO other types of messages besides updates
         this.socket.onmessage = (event) => {
-            console.log(`Message recieved: ${event.data}`)
             let parsedMessage = JSON.parse(event.data)
-            console.log(`Update parsed: `, parsedMessage)
-
             let updatedState: GameState = parsedMessage.msgData
             this.onStateUpdate(updatedState)
         };
@@ -33,6 +31,11 @@ class SocketManager {
         let message = { msgType: "action", msgData: actionMsg } 
 
         this.socket.send(JSON.stringify(message))
+    }
+
+    sendLogin(username: string) {
+        let loginMsg = { msgType: "login", msgData: username}
+        this.socket.send(JSON.stringify(loginMsg))
     }
 }
 
