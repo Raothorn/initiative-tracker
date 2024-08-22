@@ -1,4 +1,7 @@
 use serde::Serialize;
+use combatant::Combatant;
+
+mod combatant;
 
 #[derive(Clone)]
 pub struct GameState {
@@ -9,17 +12,10 @@ pub struct GameState {
 
 impl GameState {
     pub fn new(players: &Vec<&str>) -> Self {
-        let initiatives = vec![3, 12, 5];
         let combatants: Vec<Combatant> = players
             .iter()
             .enumerate()
-            .map(|(ix, name)| Combatant {
-                id: ix as u32,
-                name: name.to_string(),
-                user: "Yo".to_owned(),
-                init_roll: initiatives[ix],
-                init_mod: 1,
-            })
+            .map(|(ix, name)| Combatant::new(ix as u32, name))
             .collect();
 
         GameState {
@@ -70,19 +66,3 @@ pub struct SerialGameState {
     current_turn_id: u32,
 }
 
-#[derive(Serialize, Clone)]
-pub struct Combatant {
-    id: u32,
-    name: String,
-    user: String,
-    #[serde(rename = "initRoll")]
-    init_roll: i32,
-    #[serde(rename = "initMod")]
-    init_mod: i32,
-}
-
-impl Combatant {
-    fn initiative(&self) -> i32 {
-        self.init_mod + self.init_roll
-    }
-}
