@@ -27,6 +27,13 @@ class SocketManager {
     $onStateUpdate(fn: (gs: GameState) => void) {
         this.onStateUpdate = fn;
     }
+
+    sendAction(actionType: string, actionData: object) {
+        let actionMsg = { actionType: actionType, content: actionData }
+        let message = { msgType: "action", msgData: actionMsg } 
+
+        this.socket.send(JSON.stringify(message))
+    }
 }
 
 export const $socket = new SocketManager()

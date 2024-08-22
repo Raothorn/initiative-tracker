@@ -1,0 +1,15 @@
+procs:
+  frontend:
+    shell: "cd client && npm run dev"
+  backend:
+    shell: "cd server && cargo run"
+  # nvim:
+  #   cmd: ["nvim"]
+  # server:
+  #   shell: "nodemon server.js"
+  # webpack: "webpack serve"
+  # tests:
+  #   shell: "jest -w"
+  #   env:
+  #     NODE_ENV: test
+

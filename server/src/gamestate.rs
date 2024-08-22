@@ -1,29 +1,34 @@
 use serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct GameState {
     combatants: Vec<Combatant>,
+
     #[serde(rename = "currentTurnId")]
-    current_turn_id: i32
+    current_turn_id: u32,
+
+    turn_number: u32
 }
 
 impl GameState {
     pub fn new(players: &Vec<&str>) -> Self {
-        let combatants = players
+        let initiatives = vec![3, 12, 5];
+        let combatants: Vec<Combatant> = players
             .iter()
             .enumerate()
             .map(|(ix, name)| Combatant {
-                id: ix as i32,
+                id: ix as u32,
                 name: name.to_string(),
                 user: "Yo".to_owned(),
-                init_roll: 2,
+                init_roll: initiatives[ix],
                 init_mod: 1,
             })
             .collect();
 
         GameState {
-            combatants,
-            current_turn_id: 0
+            combatants: combatants.clone(),
+            current_turn_id: combatants[0].id,
+            turn_number: 0
         }
     }
 
@@ -32,11 +37,30 @@ impl GameState {
         GameState::new(&players)
     }
 
+    pub fn advance_turn(&self) -> Result<Self, String> {
+        let mut gs = self.clone();
+        gs.turn_number = (self.turn_number + 1) % self.combatants.len() as u32; 
+        gs.current_turn_id = self.get_current_turn_id();
+
+        return Ok(gs);
+    }
+
+    fn sorted_combatants(&self) -> Vec<Combatant> {
+        let mut combatants = self.combatants.clone();
+        combatants.sort_by(|a, b|  { a.initiative().cmp(&b.initiative()) } );
+
+        combatants
+    }
+
+    fn get_current_turn_id(&self) -> u32 {
+        let combatants = &self.sorted_combatants();
+        combatants[self.turn_number as usize].id
+    }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct Combatant {
-    id: i32,
+    id: u32,
     name: String,
     user: String,
     #[serde(rename = "initRoll")]
@@ -45,3 +69,8 @@ pub struct Combatant {
     init_mod: i32,
 }
 
+impl Combatant {
+    fn initiative(&self) -> i32 {
+        self.init_mod + self.init_roll
+    }
+}

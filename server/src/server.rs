@@ -7,19 +7,35 @@ use std::{
     thread,
 };
 
-use serde_json::json;
+use serde_json::{json, Value};
 use websocket::{
     sync::{Server, Writer},
     Message, OwnedMessage,
 };
 
-use crate::gamestate::GameState;
-
+use crate::{
+    action::{get_action, Action},
+    gamestate::GameState,
+};
 
 type Sender = Writer<TcpStream>;
 
 struct GameManager {
     state: GameState,
+}
+
+impl GameManager {
+    fn execute_action(&mut self, action: &dyn Action) -> Option<String> {
+        let res = action.execute(&self.state);
+
+        match res {
+            Ok(gs) => {
+                self.state = gs;
+                None
+            }
+            Err(err) => Some(err.to_owned()),
+        }
+    }
 }
 
 struct ServerState {
@@ -53,9 +69,45 @@ impl ServerState {
         }
     }
 
+    fn handle_action_message(&self, addr: &str, msg: &str) {
+        let mut manager = self.manager.lock().unwrap();
+        let action = get_action(msg);
+
+        if action.to_string() == "" {
+            println!("Empty action message: {}", msg);
+        } else {
+            println!("{}", action);
+        }
+
+        let result = manager.execute_action(action.as_ref());
+        match result {
+            Some(err) => {
+                println!("Error executing action: {}", err);
+            }
+            None => {
+                println!("Action {} executed successfully.", action);
+
+                drop(manager);
+                self.broadcast_gamestate();
+            }
+        }
+    }
 
     fn handle_message(&self, addr: &str, msg: &str) {
         println!("received message: {}", msg);
+        let msg: Value = serde_json::from_str(msg).unwrap();
+
+        if let Value::Object(obj) = msg {
+            let msg_type = obj.get("msgType");
+            let msg_data = obj.get("msgData");
+
+            if let (Some(Value::String(msg_type)), Some(msg_data)) = (msg_type, msg_data) {
+                match msg_type.as_str() {
+                    "action" => self.handle_action_message(addr, &msg_data.to_string()),
+                    _ => (),
+                }
+            }
+        }
     }
 }
 

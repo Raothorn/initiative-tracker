@@ -26,6 +26,7 @@
 </template>
 
 <script setup lang="ts">
+import $socket from '@/socket';
 import useGameState from '@/stores/gameState'
 
 const gameStateStore = useGameState()
@@ -34,6 +35,7 @@ function rewindTurn() {
 }
 
 function advanceTurn() {
-    gameStateStore.gameState.currentTurnId++
+    $socket.sendAction("advanceTurnAction", {}) 
+    // gameStateStore.gameState.currentTurnId++
 }
 </script>
