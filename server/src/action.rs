@@ -6,6 +6,8 @@ use serde_json::Value;
 
 use crate::gamestate::GameState;
 
+mod advance_turn_action;
+
 #[typetag::serde(tag = "actionType", content = "actionData")]
 pub trait Action: fmt::Display {
     fn execute(&self, state: &GameState) -> Result<GameState, String> {
@@ -41,23 +43,4 @@ impl Display for NoAction {
     }
 }
 
-// -----------------------------------------------------------
-// -- Advance Turn
-// -----------------------------------------------------------
-#[derive(Deserialize, Serialize)]
-struct AdvanceTurnAction;
-
-#[typetag::serde(name = "advanceTurnAction")]
-impl Action for AdvanceTurnAction {
-    fn execute(&self, gs: &GameState) -> Update {
-        gs.advance_turn()
-    }
-}
-
-impl Display for AdvanceTurnAction {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Advance turn action")
-    }
-}
-
-type Update = Result<GameState, String>;
+pub type Update = Result<GameState, String>;
