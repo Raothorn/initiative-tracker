@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { RouterLink } from 'vue-router'
-</script>
-
 <template>
   <h1 class="mt-3">Player 1 <span class="float-right">Init</span></h1>
   <nav class="nav nav-tabs mb-3">
@@ -12,3 +8,7 @@ import { RouterLink } from 'vue-router'
     <RouterLink to="/info" class="nav-link link-dark"><i class="fa-solid fa-user"></i></RouterLink>
   </nav>
 </template>
+
+<script setup lang="ts">
+import { RouterLink } from 'vue-router'
+</script>

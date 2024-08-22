@@ -1,11 +1,20 @@
 <template>
-  <td>{{ combatant.name }}</td>
-  <td></td>
-  <td>{{ combatant.initRoll + combatant.initMod }} ({{ combatant.initMod }})</td>
+  <tr :class="{ 'table-secondary': isCurrentTurn }">
+    <td>{{ combatant.name }}</td>
+    <td>{{ combatant.id }}</td>
+    <td>{{ combatant.initRoll + combatant.initMod }} ({{ combatant.initMod }})</td>
+  </tr>
 </template>
 
 <script setup lang="ts">
+import useGameState from '@/stores/gameState'
 import type { Combatant } from '../models/Combatant'
+import { computed } from 'vue'
 
-defineProps<{ combatant: Combatant }>()
+const props = defineProps<{ combatant: Combatant }>()
+
+const gameStateStore = useGameState()
+const isCurrentTurn = computed(() => {
+  return gameStateStore.gameState.currentTurnId == props.combatant.id
+})
 </script>

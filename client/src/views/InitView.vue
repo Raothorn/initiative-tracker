@@ -5,13 +5,13 @@
         <tr>
           <th>Name</th>
           <th>Effects</th>
-          <th>HP</th>
+          <th>Init</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="combatant in combatants">
+        <template v-for="combatant in gameStateStore.sortedCombatants">
           <CombatantRow :combatant="combatant"></CombatantRow>
-        </tr>
+        </template>
       </tbody>
     </table>
   </main>
@@ -20,14 +20,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import CombatantRow from '../components/CombatantRow.vue'
-import useGameState from '@/stores/app'
+import useGameState from '@/stores/gameState'
 
-const gamestateStore = useGameState()
-
-// Retrieves combatants in order of initiative
-const combatants = computed(() => {
-  let combatants = gamestateStore.gameState.combatants
-  combatants.sort((a, b) => a.initRoll + a.initMod - (b.initRoll + b.initMod))
-  return combatants
-})
+const gameStateStore = useGameState()
 </script>
