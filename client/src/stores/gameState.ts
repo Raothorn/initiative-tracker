@@ -35,11 +35,34 @@ function mockGameState(): GameState {
   }
   let encounter: Encounter = {
     combatants: combatants,
-    currentTurnId: 0
+    currentTurnId: 0,
+    isActive: true,
+    currentTurnCount: 0
   }
   return encounter
 }
 
 function mockCombatant(combatantId: number): Combatant {
   return { id: combatantId, name: 'Goblin', user: 'Your name', initMod: 1, initRoll: 10 }
+}
+
+function addCombatant() {
+
+}
+
+function advanceTurn() {
+  
+
+}
+
+function rewindTurn() {
+
+}
+
+function startEncounter() {
+
+}
+
+function endEncounter() {
+
 }
