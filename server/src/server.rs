@@ -1,5 +1,3 @@
-// use serde_json::{json, Value};
-
 use std::{
     collections::HashMap,
     net::TcpStream,
@@ -18,7 +16,21 @@ use crate::{
     gamestate::GameState,
 };
 
-type Sender = Writer<TcpStream>;
+struct Client {
+    writer: Writer<TcpStream>,
+    username: Option<String>
+}
+
+impl Client {
+    fn login(&mut self, username: &str) {
+        self.username = Some(username.to_owned());
+    }
+
+    fn send_message(&mut self, msg: &str) {
+        let _ = self.writer.send_message(&Message::text(msg));
+    }
+}
+// struct Sender = (Writer<TcpStream>, Option<String>);
 
 struct GameManager {
     state: GameState,
@@ -36,18 +48,40 @@ impl GameManager {
             Err(err) => Some(err.to_owned()),
         }
     }
+
 }
 
 struct ServerState {
     manager: Mutex<GameManager>,
-    clients: Mutex<HashMap<String, Sender>>,
+    clients: Mutex<HashMap<String, Client>>,
 }
 
 impl ServerState {
-    fn add_client(&self, addr: &str, client: Sender) {
+    fn add_client(&self, addr: &str, client: Client) {
         let mut clients = self.clients.lock().unwrap();
-
         clients.insert(addr.to_owned(), client);
+    }
+
+    fn login_client(&self, addr: &str, username: &Value) {
+        let mut clients = self.clients.lock().unwrap();
+        let client = clients.get_mut(addr);
+
+        match username {
+            Value::String(username) => {
+                match client {
+                    Some(client) => { 
+                        match client.username {
+                            Some(_) => { println!("Client already logged in...") },
+                            None => { client.login(username) },
+                        }
+                        client.login(username);
+                        println!("CLient logged in as {:?}", client.username);
+                    },
+                    None => { println!("Invalid login data")},
+                }
+            },
+            _ => {}
+        }
     }
 
     fn broadcast_gamestate(&self) {
@@ -65,7 +99,7 @@ impl ServerState {
         let mut clients = self.clients.lock().unwrap();
 
         for client in clients.values_mut() {
-            let _ = client.send_message(&Message::text(msg));
+            let _ = client.send_message(msg);
         }
     }
 
@@ -104,6 +138,7 @@ impl ServerState {
             if let (Some(Value::String(msg_type)), Some(msg_data)) = (msg_type, msg_data) {
                 match msg_type.as_str() {
                     "action" => self.handle_action_message(addr, &msg_data.to_string()),
+                    "login"  => self.login_client(addr, &msg_data),
                     _ => (),
                 }
             }
@@ -132,7 +167,9 @@ pub fn run_server() {
             // On initial connection
 
             let (mut reciever, sender) = client.split().unwrap();
-            state.add_client(&client_addr, sender);
+
+            let client = Client { writer: sender, username: None };
+            state.add_client(&client_addr, client);
 
             state.broadcast_gamestate();
 
