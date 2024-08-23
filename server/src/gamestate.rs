@@ -1,27 +1,22 @@
-use serde::Serialize;
-use combatant::Combatant;
-
+pub mod gamephase;
 mod combatant;
+pub mod encounter;
 
-#[derive(Clone)]
+
+use serde::Serialize;
+use gamephase::GamePhase;
+
+#[derive(Serialize, Clone)]
 pub struct GameState {
-    combatants: Vec<Combatant>,
-    current_turn_id: u32,
-    turn_number: u32
+    pub gamephase: GamePhase,
+    players: Vec<Player>
 }
 
 impl GameState {
     pub fn new(players: &Vec<&str>) -> Self {
-        let combatants: Vec<Combatant> = players
-            .iter()
-            .enumerate()
-            .map(|(ix, name)| Combatant::new(ix as u32, name))
-            .collect();
-
         GameState {
-            combatants: combatants.clone(),
-            current_turn_id: combatants[0].id,
-            turn_number: 0
+            gamephase: GamePhase::SetupPhase,
+            players: Vec::new()
         }
     }
 
@@ -29,40 +24,22 @@ impl GameState {
         let players = vec!["Gob 1", "Gob 2", "Gob 3"];
         GameState::new(&players)
     }
-
-    pub fn serialize(&self) -> SerialGameState {
-        SerialGameState {
-            combatants: self.combatants.clone(),
-            current_turn_id: self.get_current_turn_id(),
-        }
-    }
-
-    pub fn advance_turn(&self) -> Result<Self, String> {
-        let mut gs = self.clone();
-        gs.turn_number = (self.turn_number + 1) % self.combatants.len() as u32; 
-        gs.current_turn_id = self.get_current_turn_id();
-
-        return Ok(gs);
-    }
-
-    fn sorted_combatants(&self) -> Vec<Combatant> {
-        let mut combatants = self.combatants.clone();
-        combatants.sort_by(|a, b|  { a.initiative().cmp(&b.initiative()) } );
-
-        combatants
-    }
-
-    fn get_current_turn_id(&self) -> u32 {
-        let combatants = &self.sorted_combatants();
-        combatants[self.turn_number as usize].id
+    
+    pub fn set_phase(self, gamephase: GamePhase) -> Update<Self> {
+        Ok(GameState {
+            gamephase,
+            ..self
+        })
     }
 }
 
-// Serialization
-#[derive(Serialize)]
-pub struct SerialGameState {
-    combatants: Vec<Combatant>,
-    #[serde(rename = "currentTurnId")]
-    current_turn_id: u32,
-}
 
+type Player = String;
+// #[derive(Serialize)]
+// pub struct SerialGameState {
+//     combatants: Vec<Combatant>,
+//     #[serde(rename = "currentTurnId")]
+//     current_turn_id: u32,
+// }
+
+type Update<T> = Result<T, String>;

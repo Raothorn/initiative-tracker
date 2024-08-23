@@ -90,7 +90,7 @@ impl ServerState {
 
         let message = json!({
             "msgType": "update",
-            "msgData": manager.state.serialize(),
+            "msgData": manager.state,
         });
 
         self.broadcast(&message.to_string())

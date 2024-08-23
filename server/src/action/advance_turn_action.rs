@@ -2,7 +2,9 @@ use std::fmt;
 
 use serde::{Deserialize, Serialize};
 
-use crate::gamestate::GameState;
+use crate::gamestate::{gamephase::GamePhase, GameState};
+use crate::gamestate::encounter::{Encounter, SerialEncounter};
+use crate::util::encoded;
 
 use super::{Action, Update};
 
@@ -12,7 +14,18 @@ struct AdvanceTurnAction;
 #[typetag::serde(name = "advanceTurnAction")]
 impl Action for AdvanceTurnAction {
     fn execute(&self, gs: &GameState) -> Update {
-        gs.advance_turn()
+        let gs = gs.clone();
+
+        if let GamePhase::EncounterPhase(ref encounter) = gs.gamephase {
+            let advance_turn = encounter.raw().advance_turn();
+
+            advance_turn
+                .map(encoded::<Encounter, SerialEncounter> )
+                .and_then(|e| { gs.set_phase(GamePhase::EncounterPhase(e))})
+        }
+        else {
+            Err("Encounter phase not started".to_owned())
+        }
     }
 }
 
