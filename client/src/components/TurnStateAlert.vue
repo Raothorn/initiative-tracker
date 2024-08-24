@@ -23,7 +23,7 @@ const user = useUser()
 const isMyTurn = computed(() => {
   let currentTurnId = gameState.encounter?.currentTurnId
   if (currentTurnId != null) {
-    return currentTurnId == user.userId
+    return currentTurnId == user.playerGuid
   }
   else {
     return false;
@@ -31,8 +31,13 @@ const isMyTurn = computed(() => {
 })
 
 const isMyTurnNext = computed(() => {
-  // TODO get next turn ID from server
-  return false;
+  let nextTurnId = gameState.encounter?.nextTurnId
+  if (nextTurnId != null) {
+    return nextTurnId == user.playerGuid
+  }
+  else {
+    return false;
+  }
 })
 
 </script>

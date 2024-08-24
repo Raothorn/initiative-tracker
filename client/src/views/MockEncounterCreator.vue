@@ -8,11 +8,12 @@
         <div class="p-2">{{ player.initiativeBonus }}</div>
       </div>
     </template>
-    <button>Create Encounter</button>
+    <button @click="createEncounter">Create Encounter</button>
   </main>
 </template>
 
 <script setup lang="ts">
+import $socket from '@/socket';
 import useGameState from '@/stores/gameState'
 import { computed, ref, type Ref } from 'vue'
 
@@ -30,6 +31,11 @@ function togglePlayerSelected(guid: string) {
 
 function isPlayerSelected(guid: string) {
   return selectedPlayerGuids.value.indexOf(guid) != -1
+}
+
+function createEncounter() {
+  let actionData = { selectedPlayerGuids: selectedPlayerGuids.value }
+  $socket.sendAction("startEncounterAction", actionData)
 }
 </script>
 

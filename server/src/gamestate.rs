@@ -9,7 +9,7 @@ use gamephase::GamePhase;
 #[derive(Serialize, Clone)]
 pub struct GameState {
     pub gamephase: GamePhase,
-    players: Vec<Player>
+    pub players: Vec<Player>
 }
 
 impl GameState {
@@ -35,7 +35,6 @@ impl GameState {
         println!("PLAYERS2: {:?}", self.players);
     }
 
-   
     pub fn set_phase(self, gamephase: GamePhase) -> Update<Self> {
         Ok(GameState {
             gamephase,

@@ -6,6 +6,7 @@ use serde_json::Value;
 
 use crate::gamestate::GameState;
 
+mod start_encounter_action;
 mod login_action;
 mod advance_turn_action;
 

@@ -121,8 +121,6 @@ impl ServerState {
                 println!("Error executing action: {}", err);
             }
             None => {
-                println!("Action {} executed successfully.", action);
-
                 drop(manager);
                 self.broadcast_gamestate();
             }
@@ -130,7 +128,7 @@ impl ServerState {
     }
 
     fn handle_message(&self, addr: &str, msg: &str) {
-        println!("received message: {}", msg);
+        // println!("received message: {}", msg);
         let msg: Value = serde_json::from_str(msg).unwrap();
 
         if let Value::Object(obj) = msg {

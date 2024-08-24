@@ -1,30 +1,33 @@
 use serde::Serialize;
-use rand::Rng;
+
+use super::Player;
 
 
 #[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Combatant {
-    pub id: u32,
+    pub id: String,
     name: String,
-    user: String,
-    #[serde(rename = "initRoll")]
+    combatant_type: CombatantType,
     init_roll: u32,
-    #[serde(rename = "initMod")]
     init_mod: i32,
 }
 
-impl Combatant {
-    pub fn new(id: u32, name: &str) -> Self {
-        let mut rng = rand::thread_rng();
-        let roll = rng.gen_range(0..20) + 1;
+#[derive(Serialize, Clone)]
+pub enum CombatantType {
+    PlayerCombatant,
+    MonsterCombatant
+}
 
+impl Combatant {
+    pub fn from_player(player: &Player) -> Self {
         Combatant {
-            id,
-            name: name.to_string(),
-            user: "".to_string(),
-            init_roll: roll,
-            init_mod: 0,
-        }    
+            id: player.guid.clone(),
+            name: player.name.clone(),
+            combatant_type: CombatantType::PlayerCombatant,
+            init_roll: 10,
+            init_mod: player.initiative_bonus
+        }
     }
 
     pub fn initiative(&self) -> i32 {

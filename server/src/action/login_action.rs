@@ -8,13 +8,8 @@ use super::{Action, Update};
 #[derive(Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct LoginAction {
-    #[serde(rename = "playerName")]
     player_name: String,
-
-    #[serde(rename = "playerGuid")]
     player_guid: String,
-
-    #[serde(rename = "playerInitiativeBonus")]
     player_initiative_bonus: i32,
 }
 

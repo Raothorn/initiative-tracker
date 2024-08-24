@@ -1,7 +1,7 @@
 <template>
   <tr :class="{ 'table-secondary': isCurrentTurn }">
     <td>{{ combatant.name }}</td>
-    <td>{{ combatant.id }}</td>
+    <td></td>
     <td>{{ combatant.initRoll + combatant.initMod }} ({{ combatant.initMod }})</td>
   </tr>
 </template>
@@ -13,8 +13,15 @@ import { computed } from 'vue'
 
 const props = defineProps<{ combatant: Combatant }>()
 
-const gameStateStore = useGameState()
+const gameState = useGameState()
+
 const isCurrentTurn = computed(() => {
-  return gameStateStore.gameState.currentTurnId == props.combatant.id
+  let encounter = gameState.encounter;
+  if (encounter) {
+    return encounter.currentTurnId == props.combatant.id
+  } 
+  else {
+    return false
+  }
 })
 </script>

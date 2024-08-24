@@ -1,7 +1,6 @@
 export type Combatant = {
-  id: number
-  name: String
-  user: String
+  name: string
+  id: string
   initRoll: number
   initMod: number
 }
