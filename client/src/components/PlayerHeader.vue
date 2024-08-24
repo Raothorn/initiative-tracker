@@ -6,6 +6,7 @@
       ><i class="fa-solid fa-repeat"></i
     ></RouterLink>
     <RouterLink to="/info" class="nav-link link-dark"><i class="fa-solid fa-user"></i></RouterLink>
+    <RouterLink to="/encounter" class="nav-link link-dark"><i class="fa-solid fa-newspaper"></i></RouterLink>
   </nav>
 </template>
 

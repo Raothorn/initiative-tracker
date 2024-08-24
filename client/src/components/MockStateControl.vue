@@ -29,13 +29,11 @@
 import $socket from '@/socket';
 import useGameState from '@/stores/gameState'
 
-const gameStateStore = useGameState()
+const gameState = useGameState()
 function rewindTurn() {
-    gameStateStore.gameState.currentTurnId--
 }
 
 function advanceTurn() {
     $socket.sendAction("advanceTurnAction", {}) 
-    // gameStateStore.gameState.currentTurnId++
 }
 </script>

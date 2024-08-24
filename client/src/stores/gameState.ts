@@ -5,7 +5,8 @@ import type { GameState, Encounter, Combatant } from '../models'
 import $socket from '@/socket'
 
 export const useGameState = defineStore('gameState', () => {
-  const gameState: Ref<GameState> = ref(mockGameState())
+  // gameState is null until getting the initial state from the server
+  const gameState: Ref<GameState | null > = ref(null)
 
   // Setup gamestate updates via websocket
   $socket.$onStateUpdate((newState:GameState) => {
@@ -13,20 +14,30 @@ export const useGameState = defineStore('gameState', () => {
       gameState.value = newState
   })
 
-  const sortedCombatants = computed(() => {
-    let combatants = gameState.value.combatants
-    combatants.sort((a, b) => (a.initRoll + a.initMod) - (b.initRoll + b.initMod))
-    return combatants
-  });
+  const encounter = computed(() => {
+    if (gameState.value && "EncounterPhase" in gameState.value.gamephase) {
+      return gameState.value.gamephase.EncounterPhase.encounter
+    }
+    else {
+      return null;
+    }
+  })
 
-  const nextTurnId = computed(() => {
-    let currentTurnIndex = sortedCombatants.value.findIndex(c => {c.id == gameState.value.currentTurnId})
-    let numCombatants = gameState.value.combatants.length
-    let nextTurnIndex = (currentTurnIndex+1)%numCombatants
-    return sortedCombatants.value[nextTurnIndex].id
-  });
+  const players = computed(() => {
+    if (gameState.value) {
+      return gameState.value.players
+    }    
+    else {
+      return []
+    }
+  })
 
-  return { gameState, sortedCombatants, nextTurnId }
+  const hasInitialized = computed(() => {
+    return gameState.value != null;
+  })
+
+  // We hide the actual gamestate from the views so we can encapsulate some important stuff
+  return { hasInitialized, players, encounter }
 })
 
 export default useGameState
@@ -34,19 +45,3 @@ export default useGameState
 export const useClientState = defineStore('clientstate', () => {
   return {}
 })
-
-function mockGameState(): GameState {
-  let combatants: Combatant[] = []
-  for (let i = 0; i < 5; i++) {
-    combatants[i] = mockCombatant(i)
-  }
-  let encounter: Encounter = {
-    combatants: combatants,
-    currentTurnId: 0
-  }
-  return encounter
-}
-
-function mockCombatant(combatantId: number): Combatant {
-  return { id: combatantId, name: 'Goblin', user: 'Your name', initMod: 1, initRoll: 10 }
-}

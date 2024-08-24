@@ -1,25 +1,37 @@
 import $socket from '@/socket'
 import { defineStore } from 'pinia'
 import { computed, ref, type Ref } from 'vue'
+import useGameState from './gameState'
 
 export const useUser = defineStore('user', () => {
-    // Data
-    const userId: Ref<number> = ref(0)
-    const username: Ref<string | null> = ref(null)
+  // Data
+  const playerName: Ref<string | null> = ref(null)
+  const playerGuid: Ref<string> = ref(crypto.randomUUID().toString())
 
-    // Getters
-    const isLoggedIn = computed(() => {
-      return username.value !== null;
-    })
 
-    // Mutators
-    function login(_username: string)  {
-      // TODO wait for confirmation from server before setting username on client side
-      $socket.sendLogin(_username)
-      username.value = _username
+  // Getters
+  const isLoggedIn = computed(() => {
+    const gameState = useGameState()
+    for (const player of gameState.players) {
+      if (player.guid == playerGuid.value) {
+        return true
+      }
     }
-
-    return { userId, username, login, isLoggedIn }
+    return false
   })
-  
-  export default useUser
+
+  // Mutators
+  function login(_username: string, _initativeBonus: number) {
+    playerName.value = _username
+
+    $socket.sendAction('loginAction', {
+      playerName: _username,
+      playerGuid: playerGuid.value,
+      playerInitiativeBonus: 0
+    })
+  }
+
+  return { playerName, playerGuid, login, isLoggedIn }
+})
+
+export default useUser

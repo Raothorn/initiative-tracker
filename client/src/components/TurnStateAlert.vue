@@ -1,13 +1,13 @@
 <template>
-  <div class="alert text-center" :class="{ 'alert-primary': isMyTurn, 'alert-secondary': !isMyTurn}" role="alert">
+  <div v-if="gameState.encounter" class="alert text-center" :class="{ 'alert-primary': isMyTurn, 'alert-secondary': !isMyTurn}" role="alert">
     <template v-if="isMyTurn">
-      Your turn! {{ isMyTurnNext }} {{ gameStateStore.nextTurnId }} {{ gameStateStore.gameState.currentTurnId }}
+      Your turn! 
     </template>
     <template v-else-if="isMyTurnNext">
-      Up next {{ isMyTurnNext }} {{ gameStateStore.nextTurnId }} {{ gameStateStore.gameState.currentTurnId }}
+      Up next
     </template>
     <template v-else>
-      Waiting... {{ isMyTurnNext }} {{ gameStateStore.nextTurnId }} {{ gameStateStore.gameState.currentTurnId }}
+      Waiting...
     </template>
   </div>
 </template>
@@ -17,15 +17,22 @@ import useUser from '@/stores/currentUser';
 import useGameState from '@/stores/gameState'
 import { computed } from 'vue'
 
-const gameStateStore = useGameState()
-const userStore = useUser()
+const gameState = useGameState()
+const user = useUser()
 
 const isMyTurn = computed(() => {
-  return gameStateStore.gameState.currentTurnId == userStore.userId
+  let currentTurnId = gameState.encounter?.currentTurnId
+  if (currentTurnId != null) {
+    return currentTurnId == user.userId
+  }
+  else {
+    return false;
+  }
 })
 
 const isMyTurnNext = computed(() => {
-  return gameStateStore.nextTurnId == userStore.userId
+  // TODO get next turn ID from server
+  return false;
 })
 
 </script>
