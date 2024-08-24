@@ -1,7 +1,5 @@
 use serde::Serialize;
 
-use crate::util::{ Encoding, EncodedAs };
-
 use super::{combatant::Combatant, Update};
 
 
@@ -29,15 +27,20 @@ impl Encounter {
         
         combatants
     }
-}
 
-
-impl EncodedAs<SerialEncounter> for Encounter {
     fn encode(&self) -> SerialEncounter {
         return SerialEncounter {
             combatants: self.get_sorted_combatants(),
             current_turn_id: self.get_current_turn_id(),
         }
+    }
+}
+
+impl Serialize for Encounter {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer {
+            self.encode().serialize(serializer)
     }
 }
 
@@ -49,4 +52,3 @@ pub struct SerialEncounter {
     current_turn_id: u32
 }
 
-pub type EncounterS = Encoding<Encounter, SerialEncounter>;

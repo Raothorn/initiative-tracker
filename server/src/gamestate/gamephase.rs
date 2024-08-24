@@ -1,12 +1,18 @@
 use serde::Serialize;
 
-use crate::util::Encoding;
-
-use super::encounter::{Encounter, EncounterS, SerialEncounter};
+use super::encounter::Encounter;
 
 #[derive(Serialize, Clone)]
 pub enum GamePhase {
-    SetupPhase,
-    EncounterPhase(EncounterS)
+    SetupPhase(),
+    EncounterPhase(Encounter)
 }
 
+#[derive(Serialize, Clone)]
+pub struct SetupPhaseData {}
+
+// Has to be a struct for serialization reasons ;(
+// #[derive(Serialize, Clone)]
+// pub struct EncounterPhaseData {
+//     pub encounter: EncounterS
+// }

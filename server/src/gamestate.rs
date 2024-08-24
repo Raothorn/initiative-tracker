@@ -4,7 +4,7 @@ pub mod encounter;
 
 
 use serde::Serialize;
-use gamephase::GamePhase;
+use gamephase::{GamePhase, SetupPhaseData};
 
 #[derive(Serialize, Clone)]
 pub struct GameState {
@@ -15,7 +15,7 @@ pub struct GameState {
 impl GameState {
     pub fn new(players: &Vec<&str>) -> Self {
         GameState {
-            gamephase: GamePhase::SetupPhase,
+            gamephase: GamePhase::SetupPhase(),
             players: Vec::new()
         }
     }
