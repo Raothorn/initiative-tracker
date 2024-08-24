@@ -4,7 +4,7 @@ pub mod encounter;
 
 
 use serde::Serialize;
-use gamephase::{GamePhase, SetupPhaseData};
+use gamephase::GamePhase;
 
 #[derive(Serialize, Clone)]
 pub struct GameState {
@@ -13,18 +13,29 @@ pub struct GameState {
 }
 
 impl GameState {
-    pub fn new(players: &Vec<&str>) -> Self {
+    pub fn new() -> Self {
         GameState {
-            gamephase: GamePhase::SetupPhase(),
+            gamephase: GamePhase::SetupPhase{},
             players: Vec::new()
         }
     }
 
-    pub fn init() -> Self {
-        let players = vec!["Gob 1", "Gob 2", "Gob 3"];
-        GameState::new(&players)
+    pub fn add_player(self, player: Player) -> Update<Self> {
+        let mut gs = self.clone();
+        gs.players.push(player);
+        Ok(gs)
     }
-    
+
+    pub fn remove_player(&mut self, guid: &str) {
+        println!("GUID: {}", guid);
+        println!("PLAYER COUNT:{}", self.players.len() );
+        println!("PLAYERS: {:?}", self.players);
+        self.players.retain(|p| p.guid.as_str() == guid);
+        println!("PLAYER COUNT:{}", self.players.len() );
+        println!("PLAYERS2: {:?}", self.players);
+    }
+
+   
     pub fn set_phase(self, gamephase: GamePhase) -> Update<Self> {
         Ok(GameState {
             gamephase,
@@ -34,12 +45,13 @@ impl GameState {
 }
 
 
-type Player = String;
-// #[derive(Serialize)]
-// pub struct SerialGameState {
-//     combatants: Vec<Combatant>,
-//     #[serde(rename = "currentTurnId")]
-//     current_turn_id: u32,
-// }
+#[derive(Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct Player {
+    pub name: String,
+    pub guid: String,
+    pub initiative_bonus: i32
+}
+
 
 type Update<T> = Result<T, String>;

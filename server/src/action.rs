@@ -6,6 +6,7 @@ use serde_json::Value;
 
 use crate::gamestate::GameState;
 
+mod login_action;
 mod advance_turn_action;
 
 #[typetag::serde(tag = "actionType", content = "actionData")]
@@ -23,7 +24,10 @@ pub fn get_action(action_msg_str: &str) -> Box<dyn Action> {
         Ok(action) => action,
 
         // We want to panic if an action isn't being parsed
-        Err(err) => panic!("{}", err),
+        Err(e) => {
+            println!("{}", e);
+            Box::new(NoAction {})
+         },
     }
 }
 
@@ -36,7 +40,9 @@ struct NoAction;
 impl Action for NoAction {
     fn execute(&self, gs: &GameState) -> Update {
         Ok(gs.to_owned())
-    } }
+    } 
+}
+
 impl Display for NoAction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "No action")

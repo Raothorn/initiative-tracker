@@ -14,10 +14,10 @@ impl Action for AdvanceTurnAction {
     fn execute(&self, gs: &GameState) -> Update {
         let gs = gs.clone();
 
-        if let GamePhase::EncounterPhase(ref encounter) = gs.gamephase {
+        if let GamePhase::EncounterPhase{encounter: ref encounter} = gs.gamephase {
             encounter
                 .advance_turn()
-                .and_then(|e| { gs.set_phase(GamePhase::EncounterPhase(e)) })
+                .and_then(|e| { gs.set_phase(GamePhase::EncounterPhase {encounter: e} ) })
         }
         else {
             Err("Encounter phase not started".to_owned())

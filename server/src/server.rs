@@ -7,30 +7,25 @@ use std::{
 
 use serde_json::{json, Value};
 use websocket::{
-    sync::{Server, Writer},
-    Message, OwnedMessage,
+    sync::{Server, Writer}, Message, OwnedMessage
 };
 
 use crate::{
-    action::{get_action, Action},
+    action::{self, get_action, Action},
     gamestate::GameState,
 };
 
+// type Client = Writer<TcpStream>;
 struct Client {
     writer: Writer<TcpStream>,
-    username: Option<String>
+    guid: Option<String>
 }
 
 impl Client {
-    fn login(&mut self, username: &str) {
-        self.username = Some(username.to_owned());
-    }
-
-    fn send_message(&mut self, msg: &str) {
-        let _ = self.writer.send_message(&Message::text(msg));
+    fn send_message(&mut self, msg: &str) -> Result<(), websocket::WebSocketError> {
+        self.writer.send_message(&Message::text(msg))
     }
 }
-// struct Sender = (Writer<TcpStream>, Option<String>);
 
 struct GameManager {
     state: GameState,
@@ -62,26 +57,32 @@ impl ServerState {
         clients.insert(addr.to_owned(), client);
     }
 
-    fn login_client(&self, addr: &str, username: &Value) {
+    fn remove_client(&self, addr: &str) {
+        // remove from local clients list    
+        let mut clients = self.clients.lock().unwrap();
+        let guid = clients.get(addr).and_then(|c| c.guid.clone());
+
+        clients.remove(addr);
+
+        if let Some(guid) = guid {
+            let mut manager = self.manager.lock().unwrap();
+            manager.state.remove_player(&guid);
+
+        }
+    }
+
+    fn client_set_guid(&self, addr: &str, guid: &str) {
         let mut clients = self.clients.lock().unwrap();
         let client = clients.get_mut(addr);
-
-        match username {
-            Value::String(username) => {
-                match client {
-                    Some(client) => { 
-                        match client.username {
-                            Some(_) => { println!("Client already logged in...") },
-                            None => { 
-                                client.login(username) ;
-                                println!("CLient logged in as {:?}", client.username);
-                            },
-                        }
-                    },
-                    None => { println!("Invalid login data")} ,
-                }
-            },
-            _ => {}
+    
+        if let Some(client) = client {
+            if client.guid.is_some() {
+                println!("Client GUID already set")
+            }
+            else {
+                client.guid = Some(guid.to_owned());
+                println!("Client logged in with GUID {:?}", client.guid);
+            }
         }
     }
 
@@ -139,7 +140,7 @@ impl ServerState {
             if let (Some(Value::String(msg_type)), Some(msg_data)) = (msg_type, msg_data) {
                 match msg_type.as_str() {
                     "action" => self.handle_action_message(addr, &msg_data.to_string()),
-                    "login"  => self.login_client(addr, &msg_data),
+                    "setGuid" => self.client_set_guid(addr, &msg_data.to_string()),
                     _ => (),
                 }
             }
@@ -150,7 +151,7 @@ impl ServerState {
 pub fn run_server() {
     let state = Arc::new(ServerState {
         manager: Mutex::new(GameManager {
-            state: GameState::init(),
+            state: GameState::new(),
         }),
         clients: Mutex::new(HashMap::new()),
     });
@@ -169,8 +170,7 @@ pub fn run_server() {
 
             let (mut reciever, sender) = client.split().unwrap();
 
-            let client = Client { writer: sender, username: None };
-            state.add_client(&client_addr, client);
+            state.add_client(&client_addr, Client { writer: sender, guid: None });
 
             state.broadcast_gamestate();
 
@@ -180,9 +180,8 @@ pub fn run_server() {
                         state.handle_message(&client_addr, &txt);
                     }
                     Ok(OwnedMessage::Close(_)) => {
-                        println!("closing");
-                        // Comment this line to prevent restart on reload
-                        // state.reset();
+                        state.remove_client(&client_addr);
+                        println!("Client disconnected");
                         break;
                     }
                     _ => {}

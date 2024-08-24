@@ -1,8 +1,6 @@
 use serde::Serialize;
 
 use super::{combatant::Combatant, Update};
-
-
 #[derive(Clone)]
 pub struct Encounter {
     combatants: Vec<Combatant>,
@@ -45,10 +43,10 @@ impl Serialize for Encounter {
 }
 
 #[derive(Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct SerialEncounter {
     combatants: Vec<Combatant>,
 
-    #[serde(rename = "currentTurnId")]
     current_turn_id: u32
 }
 

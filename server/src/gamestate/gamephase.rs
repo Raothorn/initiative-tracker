@@ -4,8 +4,8 @@ use super::encounter::Encounter;
 
 #[derive(Serialize, Clone)]
 pub enum GamePhase {
-    SetupPhase(),
-    EncounterPhase(Encounter)
+    SetupPhase {},
+    EncounterPhase { encounter: Encounter }
 }
 
 #[derive(Serialize, Clone)]
